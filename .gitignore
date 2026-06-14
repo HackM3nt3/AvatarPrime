@@ -1,0 +1,33 @@
+# Secrets / tokens — NEVER commit
+.env
+.env.*
+!.env.example
+*.token
+*token*.txt
+
+# Identity media — NEVER commit real people's photos (privacy)
+pack_identidad/*
+!pack_identidad/README.md
+
+# Generated output batches
+production/
+production_seedream/
+output/
+outputs/
+
+# Image files (safety net so no face/body photo is ever committed)
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.mp4
+*.mov
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.pyc

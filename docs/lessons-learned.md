@@ -1,151 +1,127 @@
-# AvatarPrime — Lecciones aprendidas
+# AvatarPrime — Lessons learned
 
-Errores reales cometidos durante el desarrollo del framework y cómo evitarlos.
-Cada uno costó tiempo o dinero — documentados para que no los repitas.
-
----
-
-## Lección 1 — El "look plástico" viene del DATASET, no del modelo
-
-**Qué pasó:** el primer LoRA de identidad (v1) producía piel plástica de
-"AI portrait". Se intentó arreglar con prompts y lora_scale sin éxito.
-
-**Causa raíz:** el dataset tenía fotos con look editorial/polished. El LoRA
-aprendió ese estilo como parte de la identidad.
-
-**Solución:** regenerar el dataset con fotos CANDID naturales (FLUX Kontext)
-y captions que describen textura real. El v2 salió 9.3/10.
-
-**Regla:** la calidad del LoRA = calidad del dataset. Garbage in = garbage out.
+Real mistakes made during the framework's development, and how to avoid them.
+Each one cost time or money — documented so you don't repeat them.
 
 ---
 
-## Lección 2 — Captions deben describir SOLO lo que se ve
+## Lesson 1 — The "plastic look" comes from the DATASET, not the model
 
-**Qué pasó:** se escribieron captions "de memoria" usando un mapping, sin mirar
-cada imagen. Resultado: captions cruzados (vestido rojo etiquetado como
-"lencería negra", bikini como "maxi dress").
+**What happened:** the first identity LoRA (v1) produced plastic "AI portrait" skin. Attempts to fix it with prompts and lora_scale failed.
 
-**Causa raíz:** confiar en la memoria/mapping en vez de mirar cada foto.
+**Root cause:** the dataset had editorial/polished photos. The LoRA learned that style as part of the identity.
 
-**Solución:** abrir CADA imagen y escribir el caption basado en lo que se ve.
+**Fix:** regenerate the dataset with natural CANDID photos (FLUX Kontext) and captions that describe real texture. v2 scored 9.3/10.
 
-**Regla:** un caption cruzado enseña asociaciones falsas y contamina el LoRA.
-Nunca inventar; nunca asumir. Mirar la imagen.
+**Rule:** LoRA quality = dataset quality. Garbage in = garbage out.
 
 ---
 
-## Lección 3 — Separar identity y body en 2 LoRAs
+## Lesson 2 — Captions must describe ONLY what's visible
 
-**Qué pasó:** el primer dataset mezclaba 15 fotos de cara + 22 sin cara bajo
-el mismo trigger. Eso contamina: el LoRA aprende que el trigger significa
-también "cara croppeada / sin cabeza".
+**What happened:** captions were written "from memory" using a mapping, without looking at each image. Result: crossed captions (a red dress labeled "black lingerie", a bikini as "maxi dress").
 
-**Solución:** 2 LoRAs separados (identity con su trigger, body con otro),
-combinados en inference con multi-LoRA.
+**Root cause:** trusting memory/mapping instead of looking at each photo.
 
-**Regla:** no mezcles fotos con cara y sin cara bajo el mismo trigger.
+**Fix:** open EACH image and write the caption based on what's visible.
 
----
-
-## Lección 4 — El atajo img2img NO sirve para "cuerpo exacto + cara nueva"
-
-**Qué pasó:** se intentó poner la cara del avatar sobre fotos del cuerpo real
-con img2img. El cuerpo se mantenía pero la cara no aparecía.
-
-**Causa raíz:** img2img respeta la imagen original. Si la foto oculta la cara
-(vaso, pelo, crop), el img2img la mantiene oculta. Y subir el strength para
-forzar la cara cambia el cuerpo (ya no es "exacto").
-
-**Solución:** body LoRA + multi-lora genera cuerpo + cara desde cero.
-
-**Regla:** img2img da "cuerpo exacto" XOR "cara nueva", no ambos.
-Para ambos → 2 LoRAs combinados.
+**Rule:** a crossed caption teaches false associations and contaminates the LoRA. Never invent; never assume. Look at the image.
 
 ---
 
-## Lección 5 — Más lora_rank NO crea textura inexistente
+## Lesson 3 — Split identity and body into two LoRAs
 
-**Qué pasó:** se propuso subir lora_rank a 24 "para aprender más textura/poros".
+**What happened:** the first dataset mixed 15 face photos + 22 faceless ones under the same trigger. That contaminates: the LoRA learns the trigger also means "cropped face / headless".
 
-**Causa raíz:** si las imágenes fuente son de baja resolución/detalle, no hay
-microtextura que aprender. El rank alto solo aprende mejor el SESGO.
+**Fix:** two separate LoRAs (identity with its trigger, body with another), combined at inference with multi-LoRA.
 
-**Solución:** rank 16 + imágenes de buena resolución con textura real visible.
-
-**Regla:** el rank amplifica lo que existe en el dataset, no inventa detalle.
+**Rule:** don't mix photos with and without a face under the same trigger.
 
 ---
 
-## Lección 6 — Tests baratos antes de producción grande
+## Lesson 4 — The img2img shortcut does NOT work for "exact body + new face"
 
-**Qué pasó:** varias veces se evitó gastar mal haciendo 1 test antes de un lote.
-Ejemplos: test img2img ($0.08) confirmó que el atajo no servía antes de
-procesar 22 fotos; test de 1 foto antes de generar sets completos.
+**What happened:** an attempt to put the avatar's face onto real body photos with img2img. The body stayed but the face didn't appear.
 
-**Regla:** siempre 1 test de validación ($0.04-0.14) antes de gastar en
-producción grande ($2-4 training, lotes grandes).
+**Root cause:** img2img respects the original image. If the photo hides the face (cup, hair, crop), img2img keeps it hidden. And raising strength to force the face changes the body (no longer "exact").
 
----
+**Fix:** body LoRA + multi-lora generates body + face from scratch.
 
-## Lección 7 — Verificar antes de afirmar (modelos/versiones)
-
-**Qué pasó:** se asumió incorrectamente que ciertas resoluciones/comportamientos
-de los modelos eran de cierta forma. La verificación del schema real corrigió.
-
-**Regla:** verificar el schema real de cada modelo/endpoint (sus inputs, límites)
-antes de construir scripts. No asumir.
+**Rule:** img2img gives "exact body" XOR "new face", not both. For both → two combined LoRAs.
 
 ---
 
-## Lección 8 — Calibrar lora_scales, no asumir
+## Lesson 5 — More lora_rank does NOT create nonexistent texture
 
-**Qué pasó:** al combinar 2 LoRAs, el balance correcto no era obvio.
+**What happened:** raising lora_rank to 24 was proposed "to learn more texture/pores".
 
-**Solución:** probar 3 combinaciones de scales y elegir el sweet spot.
-Para este caso: identity 0.82 / body 0.70.
+**Root cause:** if the source images are low resolution/detail, there's no microtexture to learn. A high rank only learns the BIAS better.
 
-**Regla:** empezar con body scale moderado (0.50-0.70), no alto, para que
-no imponga su sesgo (bikini/fondo blanco) sobre el prompt.
+**Fix:** rank 16 + good-resolution images with real visible texture.
 
----
-
-## Lección 9 — Resolución del dataset importa para microdetalle
-
-**Qué pasó:** FLUX Kontext genera a ~1MP (880x1184), menor que FLUX Ultra (4MP).
-Para aprender poros, la resolución del dataset importa.
-
-**Trade-off:** Kontext da mejor identidad pero menor resolución. Se puede
-upscalear (clarity-upscaler) pero agrega un toque procesado.
-
-**Regla:** decisión consciente entre identidad (Kontext) y resolución (upscale).
-Para muchos casos, Kontext sin upscale ya muestra poros suficientes.
+**Rule:** rank amplifies what exists in the dataset; it doesn't invent detail.
 
 ---
 
-## Lección 10 — Datos corporales reales = consentimiento + cuidado
+## Lesson 6 — Cheap tests before large production
 
-**Qué pasó:** el cuerpo del avatar se basó en fotos reales de una persona.
+**What happened:** several times, money was saved by running one test before a batch. Examples: an img2img test ($0.08) confirmed the shortcut didn't work before processing 22 photos; a one-photo test before generating full sets.
 
-**Reglas:**
-- Consentimiento explícito (escrito) antes de usar
-- Persona adulta
-- Sin cara identificable en las fotos
-- Excluir fotos con desnudez que violen políticas de plataforma
-- No usar para suplantación
+**Rule:** always run one validation test ($0.04–0.14) before spending on large production ($2–4 training, large batches).
 
 ---
 
-## Resumen: el orden correcto
+## Lesson 7 — Verify before asserting (models/versions)
+
+**What happened:** certain model resolutions/behaviors were assumed incorrectly. Checking the real schema corrected it.
+
+**Rule:** verify the real schema of each model/endpoint (its inputs, limits) before building scripts. Don't assume.
+
+---
+
+## Lesson 8 — Calibrate lora_scales, don't assume
+
+**What happened:** when combining two LoRAs, the right balance wasn't obvious.
+
+**Fix:** try three scale combinations and pick the sweet spot. For this case: identity 0.82 / body 0.70.
+
+**Rule:** start with a moderate body scale (0.50–0.70), not high, so it doesn't impose its bias (bikini / white background) over the prompt.
+
+---
+
+## Lesson 9 — Dataset resolution matters for microdetail
+
+**What happened:** FLUX Kontext generates at ~1MP (880x1184), lower than FLUX Ultra (4MP). To learn pores, dataset resolution matters.
+
+**Trade-off:** Kontext gives better identity but lower resolution. You can upscale (clarity-upscaler) but it adds a processed touch.
+
+**Rule:** a conscious decision between identity (Kontext) and resolution (upscale). For many cases, Kontext without upscaling already shows enough pores.
+
+---
+
+## Lesson 10 — Real body data = consent + care
+
+**What happened:** the avatar's body was based on a real person's photos.
+
+**Rules:**
+- Explicit (written) consent before use
+- Adult person
+- No identifiable face in the photos
+- Exclude nude photos that violate platform policies
+- Never use for impersonation
+
+---
+
+## Summary: the correct order
 
 ```text
 1. Character bible
-2. Dataset identity CANDID (no polished) + captions de lo que se ve
-3. Entrenar identity, validar con tests baratos
-4. Dataset body (consentido, sin cara, balanceado) + captions precisos
-5. Entrenar body separado
-6. Combinar con multi-lora, calibrar scales
-7. Producción
+2. CANDID identity dataset (not polished) + captions of what's visible
+3. Train identity, validate with cheap tests
+4. Body dataset (consented, faceless, balanced) + precise captions
+5. Train body separately
+6. Combine with multi-lora, calibrate scales
+7. Production
 ```
 
-Cada paso con test/revisión antes de gastar en el siguiente.
+Each step with a test/review before spending on the next.

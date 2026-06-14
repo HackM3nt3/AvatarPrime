@@ -1,229 +1,224 @@
-# AvatarPrime — Metodología completa
+# AvatarPrime — Full methodology
 
-Guía paso a paso para construir un avatar virtual de IA con identidad consistente.
-
----
-
-## Fase 0 — Estrategia del personaje
-
-Antes de generar nada, define el personaje en un **character bible** (ver `templates/character_bible_template.md`):
-
-```text
-- Nombre + trigger word único (ej: "mychar01")
-- Nacionalidad, edad visual (siempre adulta)
-- Rasgos faciales fijos (ojos, nariz, labios, lunar distintivo)
-- Tono de piel, cabello
-- Build corporal
-- Estilo, nicho, ciudad base
-- Disclosure de IA
-```
-
-**Regla:** el trigger debe ser único y no existir en el training del modelo base
-(ej: `mychar01`, no `mychar`).
+A step-by-step guide to building an identity-consistent AI virtual avatar.
 
 ---
 
-## Fase 1 — Generación de cara (dataset identity)
+## Phase 0 — Character strategy
 
-### 1.1 Elegir el modelo
+Before generating anything, define the character in a **character bible** (see `templates/character_bible_template.md`):
 
 ```text
-FLUX 1.1 Pro Ultra (raw=true) → para exploración inicial de la cara
-FLUX Kontext Max              → para generar variaciones manteniendo identidad
+- Name + unique trigger word (e.g. "mychar01")
+- Nationality, visual age (always adult)
+- Fixed facial traits (eyes, nose, lips, distinctive mole)
+- Skin tone, hair
+- Body build
+- Style, niche, home city
+- AI disclosure
 ```
 
-El modo `raw` de FLUX Ultra produce look candid (no editorial pulido).
-Kontext mantiene la identidad usando una foto de referencia.
+**Rule:** the trigger must be unique and not exist in the base model's training (e.g. `mychar01`, not a common word like `maria`).
 
-### 1.2 Generar 12-18 fotos de cara
+---
 
-Variedad obligatoria:
+## Phase 1 — Face generation (identity dataset)
+
+### 1.1 Choose the model
+
 ```text
-- close-up (textura facial)
+FLUX 1.1 Pro Ultra (raw=true) → initial face exploration
+FLUX Kontext Max              → generate variations while keeping identity
+```
+
+FLUX Ultra's `raw` mode produces a candid look (not polished editorial). Kontext preserves identity using a reference photo.
+
+### 1.2 Generate 12–18 face photos
+
+Required variety:
+```text
+- close-up (facial texture)
 - half body
-- perfil estricto
-- 3/4 y over-the-shoulder
-- expresiones: neutra, sonrisa, risa
-- distintas luces: ventana dura, suave, exterior
-- distintos settings (NO todo el mismo lugar)
+- strict profile
+- 3/4 and over-the-shoulder
+- expressions: neutral, smile, laugh
+- different light: hard window, soft, outdoor
+- different settings (NOT all the same place)
 ```
 
-### 1.3 CRÍTICO — evitar el "look plástico"
+### 1.3 CRITICAL — avoid the "plastic look"
 
 ```text
-✅ Usar dataset CANDID natural (no editorial polished)
-✅ Prompts con vocabulario de textura real
-✅ Mencionar cámara/film específico (iPhone, Kodak Portra, Cinestill)
-✅ Negaciones: NOT plastic skin, NOT airbrushed, NOT beauty filter
+✅ Use a natural CANDID dataset (not polished editorial)
+✅ Prompts with real-texture vocabulary
+✅ Mention a specific camera/film (iPhone, Kodak Portra, Cinestill)
+✅ Negations: NOT plastic skin, NOT airbrushed, NOT beauty filter
 
-❌ Evitar: studio lighting, golden hour editorial, glamour, flawless skin
+❌ Avoid: studio lighting, editorial golden hour, glamour, flawless skin
 ```
 
 ---
 
-## Fase 2 — Captions del dataset identity
+## Phase 2 — Identity dataset captions
 
-### Regla de oro: describir SOLO lo que se ve
+### Golden rule: describe ONLY what's visible
 
 ```text
-✅ Si la foto SÍ muestra poros → "visible pores on nose and cheeks"
-❌ Si la foto NO muestra poros → NO escribir "visible pores"
+✅ If the photo DOES show pores → "visible pores on nose and cheeks"
+❌ If the photo does NOT show pores → do NOT write "visible pores"
 
-Captions imprecisos confunden el entrenamiento.
+Inaccurate captions confuse training.
 ```
 
-### Estructura
+### Structure
 
 ```text
-"<trigger> woman, [tipo de plano], [expresión], [ropa], [setting], [luz],
-[textura real visible]"
+"<trigger> woman, [shot type], [expression], [clothing], [setting], [light],
+[real visible texture]"
 
-Ejemplo:
+Example:
 "mychar01 woman, close-up phone portrait, visible pores on nose and cheeks,
 fine skin texture, soft natural makeup, hair down, soft window light from left,
 relaxed closed-mouth smile"
 ```
 
-### Evitar muletillas
+### Avoid filler
 
-No repetir la misma frase en todas las captions. Describir lo específico de cada foto.
+Don't repeat the same phrase across all captions. Describe what's specific to each photo.
 
 ---
 
-## Fase 3 — Entrenar LoRA identity
+## Phase 3 — Train the identity LoRA
 
 ```yaml
 trainer:              ostris/flux-dev-lora-trainer
-trigger_word:         <nombre>          # ej: mychar01
+trigger_word:         <name>            # e.g. mychar01
 steps:                1200
 learning_rate:        0.0003
-lora_rank:            16                # NO subir solo para "más textura"
+lora_rank:            16                # do NOT raise just for "more texture"
 resolution:           1024
 caption_dropout_rate: 0.10
-autocaption:          false             # usar captions propias
+autocaption:          false             # use your own captions
 optimizer:            adamw8bit
 ```
 
-**Importante:** más `lora_rank` NO crea textura que no exista en las imágenes fuente.
-Si las imágenes son de baja resolución/detalle, el rank alto solo aprende el sesgo.
+**Important:** more `lora_rank` does NOT create texture that isn't in the source images. If the images are low-resolution/detail, a high rank only learns the bias better.
 
 ---
 
-## Fase 4 — Validar LoRA identity
+## Phase 4 — Validate the identity LoRA
 
-Generar 10 tests con prompts que fuercen variedad:
+Generate 10 tests with prompts that force variety:
 ```text
-- close-up textura (probar lora_scale 0.7, 0.8, 0.9 para calibrar)
-- ropa de color NO presente en dataset (test de sesgo)
-- "sin joyería" explícito (test de sesgo)
-- setting nuevo (test de sesgo)
+- close-up texture (try lora_scale 0.7, 0.8, 0.9 to calibrate)
+- a clothing color NOT present in the dataset (bias test)
+- explicit "no jewelry" (bias test)
+- a new setting (bias test)
 - full body
 ```
 
-Inference recomendada:
+Recommended inference:
 ```yaml
 lora_scale:           0.85
 guidance_scale:       2.8
 num_inference_steps:  40
 ```
 
-**Criterio:** la cara debe ser consistente + textura real + respetar el prompt
-(no forzar ropa/setting del dataset).
+**Criteria:** the face must be consistent + real texture + obey the prompt (not force the dataset's clothing/setting).
 
 ---
 
-## Fase 5 — Dataset cuerpo (body LoRA)
+## Phase 5 — Body dataset (body LoRA)
 
-### 5.1 Origen de las fotos
+### 5.1 Photo source
 
 ```text
-- Fotos del cuerpo con CONSENTIMIENTO explícito (si es persona real)
-- Sin cara visible (croppeada/cubierta) para no contaminar identidad
-- O fotos generadas con AI
+- Body photos with EXPLICIT consent (if a real person)
+- No visible face (cropped/covered) to avoid contaminating identity
+- Or AI-generated photos
 ```
 
-### 5.2 Balance del dataset
+### 5.2 Dataset balance
 
 ```text
-- 20-27 fotos
-- Variedad de wardrobe (NO solo swimwear — agregar casual, athletic)
-- Algunas con cabeza EN frame (cara oculta) → evita que aprenda "cuerpo sin cabeza"
-- Variedad de ángulos (frontal, trasera, perfil)
+- 20–27 photos
+- Wardrobe variety (NOT only swimwear — add casual, athletic)
+- Some with the head IN frame (face hidden) → avoids learning "headless body"
+- Angle variety (front, back, profile)
 ```
 
-### 5.3 Captions del body
+### 5.3 Body captions
 
 ```text
-"<nombre>body body, [encuadre], [ropa], [pose], [proporciones visibles],
-[tono de piel], [textura], [cómo se oculta la cara]"
+"<name>body body, [framing], [clothing], [pose], [visible proportions],
+[skin tone], [texture], [how the face is hidden]"
 
-Ejemplo:
+Example:
 "mychar01body body, frontal view, navy blue string bikini, plain background,
 defined waist, toned abdomen, golden bronze tan, athletic build, face cropped above frame"
 ```
 
-Class word recomendado: `<nombre>body body` (categoría = body).
+Recommended class word: `<name>body body` (category = body).
 
 ---
 
-## Fase 6 — Entrenar LoRA body
+## Phase 6 — Train the body LoRA
 
 ```yaml
 trainer:              ostris/flux-dev-lora-trainer
-trigger_word:         <nombre>body
+trigger_word:         <name>body
 steps:                1400
 learning_rate:        0.0003
 lora_rank:            16
-resolution:           1024
-caption_dropout_rate: 0.05            # bajo: pegar cuerpo al trigger
+caption_dropout_rate: 0.05            # low: bind the body to the trigger
 ```
 
-Destination SEPARADO del identity LoRA.
+Destination SEPARATE from the identity LoRA.
 
 ---
 
-## Fase 7 — Combinar los 2 LoRAs
+## Phase 7 — Combine the two LoRAs
 
 ```yaml
 endpoint:     lucataco/flux-dev-multi-lora
 hf_loras:     [identity_weights_url, body_weights_url]
 lora_scales:  [0.82, 0.70]            # identity / body — sweet spot
-prompt:       "<nombre> woman <nombre>body body, [escena], [ropa], [pose],
+prompt:       "<name> woman <name>body body, [scene], [clothing], [pose],
               face visible, realistic skin texture,
               NOT plastic skin, NOT head cropped, NOT distorted anatomy"
 guidance_scale:      2.8
 num_inference_steps: 35
 ```
 
-### Calibración de scales
+### Scale calibration
 
 ```text
-Cara pierde parecido?  → subir identity (0.85)
-Cuerpo poco fiel?      → subir body (0.75)
-Algo se degrada?       → bajar el que domina
+Face loses likeness?  → raise identity (0.85)
+Body not faithful?    → raise body (0.75)
+Something degrades?   → lower whichever dominates
 
-Rango recomendado:
-  identity 0.80-0.85
-  body     0.50-0.75
+Recommended range:
+  identity 0.80–0.85
+  body     0.50–0.75
 ```
 
 ---
 
-## Fase 8 — Producción
+## Phase 8 — Production
 
 ```text
-1. Reusar el script combine_multilora.ps1
-2. Cambiar prompts (escena, ropa, pose) manteniendo ambos triggers
-3. Mantener scales calibrados
-4. Costo: ~$0.04 por foto
-5. Generar lote para feed, stories, etc.
+1. Reuse the combine_multilora.ps1 script
+2. Change prompts (scene, clothing, pose) keeping both triggers
+3. Keep calibrated scales
+4. Cost: ~$0.04 per photo
+5. Generate batches for feed, stories, etc.
 ```
 
 ---
 
-## Resumen de parámetros clave
+## Key parameter summary
 
-| Parámetro | Identity | Body | Inference combinado |
+| Parameter | Identity | Body | Combined inference |
 |---|:---:|:---:|:---:|
 | steps | 1200 | 1400 | — |
 | learning_rate | 0.0003 | 0.0003 | — |
@@ -231,10 +226,10 @@ Rango recomendado:
 | caption_dropout | 0.10 | 0.05 | — |
 | lora_scale | — | — | 0.82 / 0.70 |
 | guidance_scale | — | — | 2.8 |
-| steps inference | — | — | 35 |
+| inference steps | — | — | 35 |
 
 ---
 
-## Errores a evitar
+## Mistakes to avoid
 
-Ver `lessons-learned.md` para los errores documentados del caso de estudio.
+See `lessons-learned.md` for the documented mistakes from the case study.

@@ -8,7 +8,7 @@
 
 AvatarPrime is the distilled result of a real R&D effort to make AI-generated people that **actually look real and stay the same person** across an entire content feed. Version 2.0 abandons trained LoRAs in favor of a reference-pack approach on **Seedream 4**, which delivers natural skin and consistent identity at a fraction of the cost.
 
-> The full v1 journey (a two-LoRA FLUX pipeline) and exactly why it failed is documented in [`REGISTRO.md`](REGISTRO.md) and [`docs/case-study.md`](docs/case-study.md) — a "what *not* to do" log that's as useful as the recipe itself.
+> The full v1 journey (a two-LoRA FLUX pipeline) and exactly why it failed is documented in [`PROCESS_LOG.md`](PROCESS_LOG.md) and [`docs/case-study.md`](docs/case-study.md) — a "what *not* to do" log that's as useful as the recipe itself.
 
 ## Why 2.0 (the key insight)
 
@@ -60,7 +60,7 @@ $env:REPLICATE_API_TOKEN = "your_token_here"
 AvatarPrime/
 ├── README.md                 → this file
 ├── CHANGELOG.md              → version notes (the FLUX → Seedream pivot)
-├── REGISTRO.md               → process log + "what NOT to do" (Spanish)
+├── PROCESS_LOG.md               → process log + "what NOT to do"
 ├── pack_identidad/           → YOUR reference pack goes here (git-ignored)
 ├── scripts/
 │   ├── seedream_produce.ps1  → PRODUCTION (Seedream + pack) ★
@@ -71,7 +71,7 @@ AvatarPrime/
 └── docs/                     → methodology, lessons learned, case study
 ```
 
-## Production rules (learned the hard way — see REGISTRO.md)
+## Production rules (learned the hard way — see PROCESS_LOG.md)
 
 1. It's an **AI virtual model** — disclosure is mandatory (bio, posts).
 2. Any real body/face reference requires **explicit consent**; **adults only**, always.

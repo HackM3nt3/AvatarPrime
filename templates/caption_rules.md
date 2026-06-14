@@ -1,77 +1,77 @@
-# Reglas de Captions — AvatarPrime
+# Caption Rules — AvatarPrime
 
-Las captions son tan importantes como las imágenes. Estas reglas evitan los
-errores más comunes que arruinan un LoRA.
+Captions are as important as the images. These rules avoid the most common mistakes
+that ruin a LoRA.
 
 ---
 
-## Regla 1 — Describir SOLO lo que se ve
+## Rule 1 — Describe ONLY what's visible
 
 ```text
-✅ Si la foto SÍ muestra poros → "visible pores"
-❌ Si la foto NO muestra poros → NO escribir "visible pores"
+✅ If the photo DOES show pores → "visible pores"
+❌ If the photo does NOT show pores → do NOT write "visible pores"
 
-NUNCA escribir de memoria o de un mapping. ABRIR cada imagen y describir.
-Un caption cruzado (vestido rojo etiquetado como lencería) contamina el LoRA.
+NEVER caption from memory or from a mapping. OPEN each image and describe it.
+A crossed caption (a red dress labeled as lingerie) contaminates the LoRA.
 ```
 
-## Regla 2 — Empezar con el trigger
+## Rule 2 — Start with the trigger
 
 ```text
 Identity: "<trigger> woman, ..."
 Body:     "<trigger>body body, ..."   (class word "body")
 ```
 
-## Regla 3 — Describir lo VARIABLE, no la identidad fija
+## Rule 3 — Describe the VARIABLE, not the fixed identity
 
 ```text
-El LoRA aprende lo que NO cambia entre fotos (la identidad).
-Las captions describen lo que SÍ cambia: ropa, pose, setting, luz.
+The LoRA learns what does NOT change between photos (the identity).
+Captions describe what DOES change: clothing, pose, setting, light.
 
-NO describir rasgos faciales fijos en cada caption (el LoRA ya los aprende).
-SÍ describir: vestuario, ángulo, expresión, ambiente.
+Do NOT describe fixed facial traits in every caption (the LoRA already learns them).
+DO describe: wardrobe, angle, expression, environment.
 ```
 
-## Regla 4 — Evitar muletillas
+## Rule 4 — Avoid filler
 
 ```text
-NO repetir la misma frase larga en las 13 captions.
-Describir lo específico de cada foto.
+Don't repeat the same long phrase across all 13 captions.
+Describe what's specific to each photo.
 
-Malo:  "raw unretouched attractive natural woman" en las 13
-Bueno: cada caption describe su escena particular
+Bad:  "raw unretouched attractive natural woman" in all 13
+Good: each caption describes its particular scene
 ```
 
-## Regla 5 — Vocabulario de textura (donde aplique)
+## Rule 5 — Texture vocabulary (where it applies)
 
 ```text
 visible pores on nose and cheeks · fine skin texture · subtle under-eye texture
 slight uneven skin tone · natural lip texture · stray hairs · small skin marks
 ```
 
-## Regla 6 — Para body: describir proporciones
+## Rule 6 — For body: describe proportions
 
 ```text
 defined waist · natural hip curve · toned abdomen · athletic legs · rounded glutes
-+ indicar cómo se oculta la cara: "face cropped above frame", "face hidden by hair"
++ indicate how the face is hidden: "face cropped above frame", "face hidden by hair"
 ```
 
 ---
 
-## Ejemplo correcto (identity)
+## Correct example (identity)
 ```text
 mychar01 woman, close-up phone portrait, visible pores on nose and cheeks,
 fine skin texture, soft minimal makeup, hair down with loose strands, soft
 window light from left, relaxed closed-mouth smile
 ```
 
-## Ejemplo correcto (body)
+## Correct example (body)
 ```text
 mychar01body body, frontal view, navy blue string bikini, plain background,
 defined waist, toned abdomen, golden bronze tan, athletic build, face cropped above frame
 ```
 
-## Ejemplo INCORRECTO (caption cruzado — lo que arruina el LoRA)
+## INCORRECT example (crossed caption — what ruins the LoRA)
 ```text
-[foto muestra vestido rojo]  →  caption dice "black lace lingerie"   ❌❌❌
+[photo shows a red dress]  →  caption says "black lace lingerie"   ❌❌❌
 ```

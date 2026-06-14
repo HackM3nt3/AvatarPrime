@@ -1,59 +1,59 @@
 # Character Bible — Template
 
-Completa esto ANTES de generar nada. Define la identidad del avatar.
+Fill this out BEFORE generating anything. It defines the avatar's identity.
 
 ---
 
-## Identidad básica
+## Basic identity
 ```text
-Nombre:            [ej: Jane Doe]
-Trigger identity:  [ej: mychar01]        (único, lowercase, sin espacios)
-Trigger body:      [ej: mychar01body]        (para el LoRA de cuerpo)
-Nacionalidad:      [ej: colombiana]
-Edad visual:       [SIEMPRE adulta, ej: 25]
-Ciudad base:       [ej: Your City]
+Name:              [e.g. Jane Doe]
+Identity trigger:  [e.g. mychar01]        (unique, lowercase, no spaces)
+Body trigger:      [e.g. mychar01body]    (for the body LoRA)
+Nationality:       [e.g. Colombian]
+Visual age:        [ALWAYS adult, e.g. 25]
+Home city:         [e.g. Your City]
 ```
 
-## Rasgos faciales fijos (lo que NO cambia)
+## Fixed facial traits (what does NOT change)
 ```text
-Forma de rostro:   [ej: oval, pómulos suaves]
-Ojos:              [ej: avellana café-verde, almendrados]
-Nariz:             [ej: fina recta]
-Labios:            [ej: full naturales, ligeramente asimétricos]
-Cejas:             [ej: pobladas, naturalmente arqueadas]
-Marca distintiva:  [ej: lunar en pómulo derecho]
+Face shape:        [e.g. oval, soft cheekbones]
+Eyes:              [e.g. hazel green-brown, almond-shaped]
+Nose:              [e.g. thin, straight]
+Lips:              [e.g. naturally full, slightly asymmetric]
+Eyebrows:          [e.g. full, naturally arched]
+Distinctive mark:  [e.g. mole on the right cheekbone]
 ```
 
-## Piel y cabello
+## Skin and hair
 ```text
-Tono de piel:      [ej: dorado bronceado / media-clara]
-Cabello:           [ej: castaño con reflejos miel, ondulado, debajo de hombros]
+Skin tone:         [e.g. golden tan / medium-light]
+Hair:              [e.g. brown with honey highlights, wavy, below shoulders]
 ```
 
-## Cuerpo
+## Body
 ```text
-Build:             [ej: atlético curvy]
-Proporciones:      [ej: cintura definida, caderas naturales]
+Build:             [e.g. athletic curvy]
+Proportions:       [e.g. defined waist, natural hips]
 ```
 
-## Estilo y marca
+## Style and brand
 ```text
-Nicho:             [ej: lifestyle, moda, wellness]
-Estilo de ropa:    [ej: casual premium, swimwear, athletic]
-Paleta visual:     [colores HEX]
+Niche:             [e.g. lifestyle, fashion, wellness]
+Clothing style:    [e.g. premium casual, swimwear, athletic]
+Visual palette:    [HEX colors]
 ```
 
-## Reglas de la cuenta
+## Account rules
 ```text
-Disclosure IA:     [ej: "Modelo virtual IA | Your City lifestyle"]
-Edad visual:       adulta siempre
-Límites:           [temas que no toca]
+AI disclosure:     [e.g. "AI virtual model | Your City lifestyle"]
+Visual age:        always adult
+Limits:            [topics it won't touch]
 ```
 
-## Consentimiento (si usa datos de persona real)
+## Consent (if using a real person's data)
 ```text
-[ ] Consentimiento escrito obtenido
-[ ] Persona adulta confirmada
-[ ] Sin cara identificable en fotos de cuerpo
-[ ] Uso permitido documentado
+[ ] Written consent obtained
+[ ] Adult confirmed
+[ ] No identifiable face in body photos
+[ ] Documented permitted use
 ```
